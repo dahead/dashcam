@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"dashcam/internal/attributes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,8 +13,7 @@ import (
 	"sort"
 	"syscall"
 	"time"
-
-	"dashcam/internal/attributes"
+	// "dashcam/internal/attributes"
 )
 
 // Config holds the application configuration
@@ -24,14 +24,15 @@ type Config struct {
 	Extension       string `json:"extension"`
 	Codec           string `json:"codec"`
 	RecordAudio     bool   `json:"record_audio"`
-	EmergencyHotkey string `json:"emergency_hotkey"`
+	// EmergencyHotkey string `json:"emergency_hotkey"`
 }
 
 // Default const config filename
 const configFilename = "dashcam.json"
 const attributeMarkerName = "dashcam"
 const attributeMarkerDefaultValue = "standard_recording" // Indicates a normal, continuous recording segment
-const attributeMarkerEmergencyValue = "emergency_recording"
+// const attributeMarkerEmergencyValue = "emergency_recording"
+// var EmergencyKeyPressed = false
 
 // DefaultConfig returns the default configuration
 func DefaultConfig() Config {
@@ -47,7 +48,7 @@ func DefaultConfig() Config {
 		Extension:       ".mkv",
 		Codec:           "libx265",
 		RecordAudio:     false,
-		EmergencyHotkey: "CTRL+ALT+ENTER",
+		// EmergencyHotkey: "CTRL+SUPER+E",
 	}
 }
 
@@ -268,7 +269,16 @@ func (sr *ScreenRecorder) Start() error {
 				continue
 			}
 
-			// Todo: If "Emergency-Hotkey" was pressed, save and mark video under "emergency"
+			//// Todo: If "Emergency-Hotkey" was pressed, save and mark video under "emergency"
+			//attrvalue := attributeMarkerDefaultValue
+			//if EmergencyKeyPressed {
+			//	attrvalue = attributeMarkerEmergencyValue
+			//	EmergencyKeyPressed = false
+			//}
+			//// Mark file as dashcam recording
+			//if err := attributes.SetMarker(filename, attributeMarkerName, attrvalue); err != nil {
+			//	log.Printf("Warning: Failed to set marker on file '%s': %v", filename, err)
+			//}
 
 			// Mark file as dashcam recording
 			if err := attributes.SetMarker(filename, attributeMarkerName, attributeMarkerDefaultValue); err != nil {
@@ -284,6 +294,14 @@ func (sr *ScreenRecorder) Start() error {
 		}
 	}
 }
+
+//func MarkCurrentVideoEmergency() {
+//	//exec.Command("kitty").Start()
+//	// mark current video as emergency
+//	EmergencyKeyPressed = true
+//	// fmt.Println("Emergency hotkey pressed!") // print to STDOUT
+//	log.Println("Emergency hotkey pressed!")
+//}
 
 func main() {
 	log.Printf("Loading configuration from %s...\n", configFilename)
@@ -307,6 +325,18 @@ func main() {
 	if _, err := exec.LookPath("wf-recorder"); err != nil {
 		log.Fatal("wf-recorder not found. Please install wf-recorder first.")
 	}
+
+	//// Hyprland Hotkey Manager (watch for hotkey so  we know its an emergency recording)
+	//manager, _ := hotkey.NewHyprlandHotkeyManager()
+	//defer manager.Close()
+	//
+	//// Register hotkeys
+	//manager.RegisterHotkey(config.EmergencyHotkey, func(hotkey string) {
+	//	MarkCurrentVideoEmergency()
+	//})
+	//
+	//// Start listening
+	//manager.StartListening()
 
 	// Create and start screen recorder
 	recorder := NewScreenRecorder(config)
