@@ -24,12 +24,14 @@ type Config struct {
 	Extension       string `json:"extension"`
 	Codec           string `json:"codec"`
 	RecordAudio     bool   `json:"record_audio"`
+	EmergencyHotkey string `json:"emergency_hotkey"`
 }
 
 // Default const config filename
 const configFilename = "dashcam.json"
 const attributeMarkerName = "dashcam"
 const attributeMarkerDefaultValue = "standard_recording" // Indicates a normal, continuous recording segment
+const attributeMarkerEmergencyValue = "emergency_recording"
 
 // DefaultConfig returns the default configuration
 func DefaultConfig() Config {
@@ -45,6 +47,7 @@ func DefaultConfig() Config {
 		Extension:       ".mkv",
 		Codec:           "libx265",
 		RecordAudio:     false,
+		EmergencyHotkey: "CTRL+ALT+ENTER",
 	}
 }
 
@@ -264,6 +267,8 @@ func (sr *ScreenRecorder) Start() error {
 				time.Sleep(2 * time.Second)
 				continue
 			}
+
+			// Todo: If "Emergency-Hotkey" was pressed, save and mark video under "emergency"
 
 			// Mark file as dashcam recording
 			if err := attributes.SetMarker(filename, attributeMarkerName, attributeMarkerDefaultValue); err != nil {

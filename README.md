@@ -1,4 +1,4 @@
-# Go Dashcam Screen Recorder
+# Dashcam - Screen Recorder written in Go
 
 ## Description
 
