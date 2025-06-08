@@ -4,6 +4,15 @@
 
 This project is a Go application that provides continuous screen recording functionality, similar to a dashcam. It records the screen in segments, manages the number of recording files by deleting older ones, and uses `wf-recorder` for the actual screen capture on Wayland-based systems. Recordings are marked with extended file attributes.
 
+## How it Works
+
+*   The application starts and loads its configuration.
+*   It enters a loop, recording screen segments of `recording_length_seconds`.
+*   Each recorded file is saved to the `recordings_dir`.
+*   An extended file attribute (`user.dashcam`) is set on each recording to identify it.
+*   Periodically, the application checks the number of marked recording files. If it exceeds `max_files`, the oldest files (based on modification time) are deleted.
+*   The recording process uses the `wf-recorder` command-line tool.
+
 ## Prerequisites
 
 *   **Go**: Version 1.24 or higher.
@@ -13,7 +22,7 @@ This project is a Go application that provides continuous screen recording funct
 
 ## Configuration
 
-The application uses a JSON configuration file named `dashcam.json` located in your user's home directory (e.g., `~/.config/dashcam.json` or `~/dashcam.json` depending on OS conventions, though the code places it directly in `~`).
+The application uses a JSON configuration file named `dashcam.json` located in the user's home directory (`~/dashcam.json`).
 
 If the `dashcam.json` file does not exist when the application starts, it will be created with default values.
 
@@ -44,12 +53,3 @@ json {
     "record_audio": true 
 }
 ```
-
-## How it Works
-
-*   The application starts and loads its configuration.
-*   It enters a loop, recording screen segments of `recording_length_seconds`.
-*   Each recorded file is saved to the `recordings_dir`.
-*   An extended file attribute (`user.dashcam`) is set on each recording to identify it.
-*   Periodically, the application checks the number of marked recording files. If it exceeds `max_files`, the oldest files (based on modification time) are deleted.
-*   The recording process uses the `wf-recorder` command-line tool.
